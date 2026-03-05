@@ -97,17 +97,16 @@ Execute the main script to run a pre-configured experiment involving a 4-core sy
 
 The project requires Python 3.x and a few standard data science libraries:
 
-Bash
-
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   pip install matplotlib numpy   `
-
+```bash
+pip install matplotlib numpy heapq
+```
 Running the Simulation
 
 To execute the default experiment, simply run main.py:
 
-Bash
-
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   python main.py   `
+```Bash
+python main.py   `
+```
 
 The console will output the configuration, the generated tasks, and the simulation results (Failed Assignments, Migrations, and Missed Deadlines) for each strategy.
 
@@ -128,9 +127,12 @@ Upon running main.py, the simulator will automatically generate and save three v
 
 You can easily adjust the simulation parameters at the top of main.py:
 
-Python
-
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   NUM_CORES = 4  SIMULATION_DURATION = 1000  MIGRATION_PENALTY = 1      # Ticks added to a job's remaining time upon migration  NUM_CLUSTERS = 2           # For Hybrid Scheduling   `
+```python
+NUM_CORES = 4
+SIMULATION_DURATION = 1000
+MIGRATION_PENALTY = 1      # Ticks added to a job's remaining time upon migration
+NUM_CLUSTERS = 2           # For Hybrid Scheduling   `
+```
 
 🤝 Contributing
 ---------------
