@@ -1,82 +1,151 @@
-Real-Time Multi-Core Scheduling Simulator
-This project is a discrete-event simulation framework designed to analyze and compare the performance of various real-time scheduling algorithms on multi-core systems. It specifically evaluates the trade-offs between Partitioned, Global, and Hybrid (Clustered) Earliest Deadline First (EDF) scheduling strategies.
+Comparative Analysis of Real-Time Scheduling Algorithms on a Multicore Processor via Event Simulator in Python
+==============================================================================================================
 
-Table of Contents
-Overview
+This repository contains a Python-based discrete-event simulation framework designed to evaluate and compare real-time scheduling algorithms on multi-core systems. The project specifically analyzes the trade-offs between **Partitioned**, **Global**, and **Hybrid (Clustered)** Earliest Deadline First (EDF) scheduling strategies.
 
-Core Metrics
+📖 Project Overview
+-------------------
 
-Scheduling Strategies
+In real-time systems, the challenge of multi-core scheduling involves balancing processor utilization against system overheads. This simulator models a hardware environment where periodic tasks are released as jobs, each with specific execution times and deadlines.
 
-Key Components
+The simulation focuses on three critical performance metrics:
 
-Simulation & Visualization
+*   **Offline Fragmentation:** Tasks rejected because they cannot "fit" into a core or cluster during the initial assignment phase.
+    
+*   **Runtime Migrations:** The overhead caused when a job moves from one core to another, potentially invalidating caches and increasing execution time.
+    
+*   **Deadline Performance:** The count of jobs that fail to complete their work before their absolute deadline.
+    
 
-Getting Started
+🛠 Scheduling Strategies
+------------------------
 
-Overview
-In real-time multi-core systems, scheduling involves assigning periodic tasks to multiple processors while ensuring all deadlines are met. This simulator provides a controlled environment to observe how different architectural approaches handle task distribution, preemption, and core migration overhead.
+### 1\. Partitioned EDF
 
-Core Metrics
-The simulator evaluates performance based on three critical real-time systems metrics:
+*   **Logic:** Uses a "First-Fit Decreasing" bin-packing heuristic to assign tasks to specific cores permanently.
+    
+*   **Advantages:** Zero migration overhead since jobs never leave their assigned core.
+    
+*   **Disadvantages:** Subject to heavy fragmentation; a core may be idle while another is overloaded simply because a task was not assigned to it.
+    
 
-Failed Assignments (Fragmentation): Tasks that cannot be scheduled during the offline phase due to capacity constraints or core fragmentation.
+### 2\. Global EDF
 
-Migrations (Jitter): The number of times a job moves from one core to another during execution. Migrations typically incur a performance penalty to account for cache invalidation and context switching.
+*   **Logic:** All ready jobs are placed in a single global priority queue. At every tick, the $m$ highest-priority jobs (those with the earliest deadlines) are assigned to the $m$ available cores.
+    
+*   **Advantages:** Theoretically optimal for utilization as it prevents cores from being idle while work is available.
+    
+*   **Disadvantages:** High migration frequency as jobs are frequently moved between cores to maintain priority, leading to significant performance penalties.
+    
 
-Missed Deadlines (Performance): The count of job instances that fail to complete their worst-case execution time (WCET) before their absolute deadline.
+### 3\. Hybrid (Clustered) EDF
 
-Scheduling Strategies
-1. Partitioned EDF
-Tasks are permanently assigned to a specific core using a First-Fit Decreasing bin-packing heuristic.
+*   **Logic:** Cores are grouped into clusters (e.g., a 4-core system split into two 2-core clusters). Tasks are partitioned into these clusters, but once inside, they are scheduled globally across all cores within that cluster.
+    
+*   **Advantages:** A middle-ground approach that reduces global migration while providing better flexibility than strict partitioning.
+    
 
-Pros: Zero migration overhead; easy to implement using standard single-core scheduling theory.
+📂 File Structure
+-----------------
 
-Cons: Susceptible to core fragmentation; cannot utilize idle time on other cores if the assigned core is overloaded.
+*   Core.py: Models the hardware CPU, tracking active time, idle time, and execution history.
+    
+*   Task.py & Job.py: Define the parameters of periodic real-time tasks (Period, WCET, Deadline) and their runtime instances.
+    
+*   PartitionedScheduler.py: Implements the offline bin-packing and partitioned runtime logic.
+    
+*   GlobalScheduler.py: Implements the single-queue global scheduling architecture.
+    
+*   HybridScheduler.py: Implements cluster-level partitioning and intra-cluster global scheduling.
+    
+*   TaskGenerator.py: Generates synthetic task sets using a UUniFast-style distribution to reach target system utilizations.
+    
+*   Visualizer.py: Contains the logic for generating performance charts using Matplotlib.
+    
+*   main.py: The central execution script to run simulations and output results.
+    
 
-2. Global EDF
-All ready jobs are placed into a single global priority queue. The top m jobs (where m is the number of cores) are dispatched to any available core every clock tick.
+📊 Visualization and Analysis
+-----------------------------
 
-Pros: Highly flexible; minimizes idle cores; theoretically higher system utilization.
-
-Cons: High migration overhead; significant contention for the global queue lock in real hardware.
-
-3. Hybrid (Clustered) EDF
-Cores are grouped into clusters (e.g., two clusters of two cores each). Tasks are partitioned into specific clusters, but within each cluster, they are scheduled globally.
-
-Pros: Balances the utilization benefits of global scheduling with the reduced migration scope of partitioning.
-
-Cons: Requires a more complex offline partitioning phase than standard Global EDF.
-
-Key Components
-Core.py: Simulates the physical hardware, tracking active and idle time while maintaining a history of executed job IDs.
-
-Task.py & Job.py: Define the periodic task parameters (Execution Time, Period, Utilization) and the individual job instances released during simulation.
-
-TaskGenerator.py: Generates synthetic workloads using a simplified UUniFast-like approach to randomly distribute system utilization across tasks.
-
-Visualizer.py: Utilizes Matplotlib to generate comparative bar charts, migration timelines, and core utilization heatmaps.
-
-Simulation & Visualization
 The simulator produces three primary visual outputs to aid in performance analysis:
 
-Comparative Analysis: A log-scale bar chart showing totals for failed assignments, migrations, and missed deadlines.
+1.  **Comparative Bar Chart:** A high-level view of failed assignments, migrations, and missed deadlines across the three strategies.
+    
+2.  **Migration Timeline:** A line graph tracking how cumulative migration overhead grows over the simulation duration, illustrating system stability.
+    
+3.  **Utilization Heatmap:** A grid showing the load distribution (active vs. idle time) for every core in every strategy, highlighting load balancing efficiency.
+    
 
-Migration Timeline: A line graph tracking the cumulative accumulation of migration overhead throughout the simulation duration.
+🚀 Getting Started
+------------------
 
-Utilization Heatmap: A grid showing the percentage load for every core under each strategy, highlighting how well-balanced the system is.
+### Prerequisites
 
-Getting Started
-Prerequisites
-Python 3.x
+*   Python 3.x
+    
+*   Matplotlib
+    
+*   NumPy
+    
 
-Matplotlib
+### Running the Simulation
 
-NumPy
+Execute the main script to run a pre-configured experiment involving a 4-core system and a 1000-tick duration:
 
-Running the Experiment
-To execute the default simulation (4 cores, 1000 ticks, with a 1-tick migration penalty):
+### Prerequisites
+
+The project requires Python 3.x and a few standard data science libraries:
 
 Bash
-python main.py
-The script will output the simulation results to the console and save the generated charts as PNG files in the project directory.
+
+Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   pip install matplotlib numpy   `
+
+Running the Simulation
+
+To execute the default experiment, simply run main.py:
+
+Bash
+
+Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   python main.py   `
+
+The console will output the configuration, the generated tasks, and the simulation results (Failed Assignments, Migrations, and Missed Deadlines) for each strategy.
+
+📊 Outputs & Visualizations
+---------------------------
+
+Upon running main.py, the simulator will automatically generate and save three visualization files to the root directory:
+
+1.  **comparative\_analysis.png**: A log-scale bar chart comparing the three strategies based on Failed Assignments (Fragmentation), Total Migrations (Jitter), and Missed Deadlines (Performance).
+    
+2.  **migration\_timeline.png**: A line graph plotting the cumulative migrations over time. This clearly illustrates the constant overhead of Global EDF compared to the stabilized bounds of Hybrid EDF and the zero-migration characteristic of Partitioned EDF.
+    
+3.  **utilization\_heatmap.png**: A heatmap displaying the percentage of time each core spent actively executing jobs, providing visual insight into how well each strategy balances the load across the hardware.
+    
+
+⚙️ Configuration
+----------------
+
+You can easily adjust the simulation parameters at the top of main.py:
+
+Python
+
+Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   NUM_CORES = 4  SIMULATION_DURATION = 1000  MIGRATION_PENALTY = 1      # Ticks added to a job's remaining time upon migration  NUM_CLUSTERS = 2           # For Hybrid Scheduling   `
+
+🤝 Contributing
+---------------
+
+This project was developed as an academic exercise by students from the **Frankfurt University of Applied Sciences, Department of Engineering** 🏛️.
+
+### 👨‍💻 Contributors
+
+*   🎓 **Asad Ismail** (Matriculation No: 1542529)
+    
+*   🎓 **Akbar Khan** (Matriculation No: 1612839)
+    
+*   🎓 **Muhammad Suhaib Khalid** (Matriculation No: 1542491)
+    
+
+We welcome contributions to improve the simulator! 🚀
+
+If you would like to contribute, please feel free to fork the repository, experiment with new scheduling heuristics (such as Least Laxity First), and submit a pull request. For major changes, please open an issue first to discuss what you would like to change. All feedback and improvements are highly appreciated! 💡
