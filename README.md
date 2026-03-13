@@ -134,6 +134,20 @@ MIGRATION_PENALTY = 1      # Ticks added to a job's remaining time upon migratio
 NUM_CLUSTERS = 2           # For Hybrid Scheduling   `
 ```
 
+📊 Results & Analysis
+---------------------
+
+The simulator outputs high-resolution PNG files for reporting:
+
+*   **comparative\_analysis.png**: Provides a log-scale comparison of strategy failures.
+    
+*   **migration\_timeline.png**: Shows how the Global strategy often results in a steep linear increase in migrations compared to the more stable Hybrid approach.
+    
+*   **utilization\_heatmap.png**: Visualizes how Partitioned scheduling can lead to "hot" and "cold" cores due to fragmentation, while Global/Hybrid strategies spread load more evenly.
+
+
+
+
 🤝 Contributing
 ---------------
 
